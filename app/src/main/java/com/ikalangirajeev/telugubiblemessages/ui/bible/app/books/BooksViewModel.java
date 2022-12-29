@@ -1,13 +1,8 @@
 package com.ikalangirajeev.telugubiblemessages.ui.bible.app.books;
 
 import android.app.Application;
-import android.content.SharedPreferences;
-import android.os.Handler;
-import android.os.Looper;
-import android.preference.PreferenceManager;
 
 import androidx.annotation.NonNull;
-import androidx.core.os.HandlerCompat;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
@@ -23,17 +18,15 @@ import com.ikalangirajeev.telugubiblemessages.ui.roombible.TeluguBibleDao;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
-import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
 
 public class BooksViewModel extends AndroidViewModel {
     private static final String TAG = "BooksViewModel";
-
-    ExecutorService executorService = Executors.newFixedThreadPool(10);
-    private Handler handler = HandlerCompat.createAsync(Looper.getMainLooper());
 
     private String englishBooks[] = {
             "Genesis", "Exodus", "Leviticus", "Numbers", "Deuteronomy", "Joshua",
@@ -48,13 +41,13 @@ public class BooksViewModel extends AndroidViewModel {
     private String teluguBooks[] = {
             "ఆదికాండము", "నిర్గమకాండము", "లేవీయకాండము", "సంఖ్యాకాండము", "ద్వితీయోపదేశకాండమ", "యెహొషువ",
             "న్యాయాధిపతులు", "రూతు", "I సమూయేలు", "II సమూయేలు", "I రాజులు",
-            "II రాజులు", "I దినవృత్తాంతములు", "II దినవృత్తాంతములు", "ఎజ్రా", "నెహెమ్యా", "ఎస్తేరు", "యోబు గ్రంథము",
-            "కీర్తనల గ్రంథము", "సామెతలు", "ప్రసంగి", "పరమగీతము", "యెషయా గ్రంథము", "యిర్మీయా", "విలాపవాక్యములు", "యెహెజ్కేలు",
+            "II రాజులు", "I దినవృత్తాంతములు", "II దినవృత్తాంతములు", "ఎజ్రా", "నెహెమ్యా", "ఎస్తేరు", "యోబు గ్రంథము",
+            "కీర్తనల గ్రంథము", "సామెతలు", "ప్రసంగి", "పరమగీతము", "యెషయా గ్రంథము", "యిర్మీయా", "విలాపవాక్యములు", "యెహెజ్కేలు",
             "దానియేలు", "హొషేయ", "యోవేలు", "ఆమోసు", "ఓబద్యా", "యోనా", "మీకా", "నహూము", "హబక్కూకు", "జెఫన్యా",
-            "హగ్గయి", "జెకర్యా", "మలాకీ", "మత్తయి సువార్త", "మార్కు సువార్త", "లూకా సువార్త", "యోహాను సువార్త", "అపొస్తలుల కార్యములు",
-            "రోమీయులకు", "1 కొరింథీయులకు", "2 కొరింథీయులకు", "గలతీయులకు", "ఎఫెసీయులకు", "ఫిలిప్పీయులకు",
-            "కొలొస్సయులకు", "1 థెస్సలొనీకయులకు", "2 థెస్సలొనీకయులకు", "1 తిమోతికి", "2 తిమోతికి", "తీతుకు", "ఫిలేమోనుకు",
-            "హెబ్రీయులకు", "యాకోబు", "1 పేతురు", "2 పేతురు", "1 యోహాను", "2 యోహాను", "3 యోహాను", "యూదా", "ప్రకటన గ్రంథము"};
+            "హగ్గయి", "జెకర్యా", "మలాకీ", "మత్తయి సువార్త", "మార్కు సువార్త", "లూకా సువార్త", "యోహాను సువార్త", "అపొస్తలుల కార్యములు",
+            "రోమీయులకు", "1 కొరింథీయులకు", "2 కొరింథీయులకు", "గలతీయులకు", "ఎఫెసీయులకు", "ఫిలిప్పీయులకు",
+            "కొలొస్సయులకు", "1 థెస్సలొనీకయులకు", "2 థెస్సలొనీకయులకు", "1 తిమోతికి", "2 తిమోతికి", "తీతుకు", "ఫిలేమోనుకు",
+            "హెబ్రీయులకు", "యాకోబు", "1 పేతురు", "2 పేతురు", "1 యోహాను", "2 యోహాను", "3 యోహాను", "యూదా", "ప్రకటన గ్రంథము"};
     private String tamilBooks[] = {
             "ஆதியாகமம்", "யாத்திராகமம்", "லேவியராகமம்", "எண்ணாகமம்", "உபாகமம்", "யோசுவா", "நியாயாதிபதிகள்", "ரூத்", "1 சாமுவேல்",
             "2 சாமுவேல்", "1 இராஜாக்கள்", "2 இராஜாக்கள்", "1 நாளாகமம்", "2 நாளாகமம்", "எஸ்றா", "நெகேமியா", "எஸ்தர்", "யோபு",
@@ -96,97 +89,80 @@ public class BooksViewModel extends AndroidViewModel {
             "1 തിമൊഥെയൊസ്", "2 തിമൊഥെയൊസ്", "തീത്തൊസ്", "ഫിലേമോൻ", "എബ്രായർ", "യാക്കോബ്",
             "1 പത്രൊസ്", "2 പത്രൊസ്", "1 യോഹന്നാൻ", "2 യോഹന്നാൻ", "3 യോഹന്നാൻ", "യൂദാ", "വെളിപ്പാട്"};
 
-    private List<Data> dataList;
     private MutableLiveData<List<Data>> mLiveDataList;
-    private Application application;
 
     private CompositeDisposable compositeDisposable = new CompositeDisposable();
-    Observable<List<Data>> observable;
 
-
+    BibleDatabase bibleDatabase;
 
     public BooksViewModel(@NonNull Application application) {
         super(application);
-        this.application = application;
-        dataList = new ArrayList<>();
+        bibleDatabase = BibleDatabase.getBibleDatabase(application.getApplicationContext());
         mLiveDataList = new MutableLiveData<>();
     }
 
-    public LiveData<List<Data>> getText(String bibleSelected) {
-        dataList.clear();
+    public LiveData<List<Data>> getBooksForSelectedBible(String bibleSelected) {
 
-        executorService.execute(new Runnable() {
-            @Override
-            public void run() {
-                switch (bibleSelected) {
-                    case "bible_english":
-                        for (int i = 0; i < englishBooks.length; i++) {
-                            BibleDatabase bibleDatabase = BibleDatabase.getBibleDatabase(application.getApplicationContext());
-                            EnglishBibleDao englishBibleDao = bibleDatabase.englishBibleDao();
-                            final int chaptersCount = englishBibleDao.getChaptersCount(i);
-                            Data data = new Data(englishBooks[i], chaptersCount + " Chapters", chaptersCount);
-                            dataList.add(data);
-                        }
-
-
-                        break;
-                    case "bible_tamil":
-                        for (int i = 0; i < tamilBooks.length; i++) {
-                            BibleDatabase bibleDatabase = BibleDatabase.getBibleDatabase(application.getApplicationContext());
-                            TamilBibleDao tamilBibleDao = bibleDatabase.tamilBibleDao();
-                            final int chaptersCount = tamilBibleDao.getChaptersCount(i);
-                            Data data = new Data(tamilBooks[i], chaptersCount + " அத்தியாயங்கள்", chaptersCount);
-                            dataList.add(data);
-                        }
-                        break;
-                    case "bible_kannada":
-
-                        for (int i = 0; i < kannadaBooks.length; i++) {
-                            BibleDatabase bibleDatabase = BibleDatabase.getBibleDatabase(application.getApplicationContext());
-                            KannadaBibleDao kannadaBibleDao = bibleDatabase.kannadaBibleDao();
-                            final int chaptersCount = kannadaBibleDao.getChaptersCount(i);
-                            Data data = new Data(kannadaBooks[i], chaptersCount + " ಅಧ್ಯಾಯಗಳು", chaptersCount);
-                            dataList.add(data);
-                        }
-                        break;
-                    case "bible_hindi":
-                        for (int i = 0; i < hindiBooks.length; i++) {
-                            BibleDatabase bibleDatabase = BibleDatabase.getBibleDatabase(application.getApplicationContext());
-                            HindiBibleDao hindiBibleDao = bibleDatabase.hindiBibleDao();
-                            final int chaptersCount = hindiBibleDao.getChaptersCount(i);
-                            Data data = new Data(hindiBooks[i], chaptersCount + " अध्याय", chaptersCount);
-                            dataList.add(data);
-                        }
-                        break;
-                    case "bible_malayalam":
-                        for (int i = 0; i < malayalamBooks.length; i++) {
-                            BibleDatabase bibleDatabase = BibleDatabase.getBibleDatabase(application.getApplicationContext());
-                            MalayalamBibleDao malayalamBibleDao = bibleDatabase.malayalamBibleDao();
-                            final int chaptersCount = malayalamBibleDao.getChaptersCount(i);
-                            Data data = new Data(malayalamBooks[i], chaptersCount + " അധ്യായങ്ങൾ", chaptersCount);
-                            dataList.add(data);
-                        }
-                        break;
-                    default:
-                        for (int i = 0; i < teluguBooks.length; i++) {
-                            BibleDatabase bibleDatabase = BibleDatabase.getBibleDatabase(application.getApplicationContext());
-                            TeluguBibleDao teluguBibleDao = bibleDatabase.teluguBibleDao();
-                            final int chaptersCount = teluguBibleDao.getChaptersCount(i);
-                            Data data = new Data(teluguBooks[i], chaptersCount + " అధ్యాయాలు", chaptersCount);
-                            dataList.add(data);
-                        }
-                        break;
-                }
-
-                handler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        mLiveDataList.setValue(dataList);
-                    }
-                });
+        CompletableFuture<List<Data>> listCompletableFuture = CompletableFuture.supplyAsync(() -> {
+            switch (bibleSelected) {
+                case "bible_english":
+                    EnglishBibleDao englishBibleDao = bibleDatabase.englishBibleDao();
+                    return IntStream.range(0, englishBooks.length)
+                            .mapToObj(index -> {
+                                Integer chaptersCount = englishBibleDao.getChaptersCount(index);
+                                return new Data(englishBooks[index], chaptersCount + " Chapters", chaptersCount);
+                            })
+                            .collect(Collectors.toList());
+                case "bible_tamil":
+                    TamilBibleDao tamilBibleDao = bibleDatabase.tamilBibleDao();
+                    return IntStream.range(0, tamilBooks.length)
+                            .mapToObj(index -> {
+                                Integer chaptersCount = tamilBibleDao.getChaptersCount(index);
+                                return new Data(tamilBooks[index], chaptersCount + " அத்தியாயங்கள்", chaptersCount);
+                            })
+                            .collect(Collectors.toList());
+                case "bible_kannada":
+                    KannadaBibleDao kannadaBibleDao = bibleDatabase.kannadaBibleDao();
+                    return IntStream.range(0, kannadaBooks.length)
+                            .mapToObj(index -> {
+                                Integer chaptersCount = kannadaBibleDao.getChaptersCount(index);
+                                return new Data(kannadaBooks[index], chaptersCount + " ಅಧ್ಯಾಯಗಳು", chaptersCount);
+                            })
+                            .collect(Collectors.toList());
+                case "bible_hindi":
+                    HindiBibleDao hindiBibleDao = bibleDatabase.hindiBibleDao();
+                    return IntStream.range(0, hindiBooks.length)
+                            .mapToObj(index -> {
+                                Integer chaptersCount = hindiBibleDao.getChaptersCount(index);
+                                return new Data(hindiBooks[index], chaptersCount + " अध्याय", chaptersCount);
+                            })
+                            .collect(Collectors.toList());
+                case "bible_malayalam":
+                    MalayalamBibleDao malayalamBibleDao = bibleDatabase.malayalamBibleDao();
+                    return IntStream.range(0, malayalamBooks.length)
+                            .mapToObj(index -> {
+                                Integer chaptersCount = malayalamBibleDao.getChaptersCount(index);
+                                return new Data(malayalamBooks[index], chaptersCount + " അധ്യായങ്ങൾ", chaptersCount);
+                            })
+                            .collect(Collectors.toList());
+                default:
+                    TeluguBibleDao teluguBibleDao = bibleDatabase.teluguBibleDao();
+                    return IntStream.range(0, teluguBooks.length)
+                            .mapToObj(index -> {
+                                Integer chaptersCount = teluguBibleDao.getChaptersCount(index);
+                                return new Data(teluguBooks[index], chaptersCount + " అధ్యాయాలు", chaptersCount);
+                            })
+                            .collect(Collectors.toList());
             }
         });
 
+        try {
+            mLiveDataList.setValue(listCompletableFuture.get());
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         return mLiveDataList;
     }
 

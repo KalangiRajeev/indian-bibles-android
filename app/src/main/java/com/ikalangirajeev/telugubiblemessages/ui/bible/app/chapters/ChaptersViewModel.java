@@ -1,11 +1,8 @@
 package com.ikalangirajeev.telugubiblemessages.ui.bible.app.chapters;
 
 import android.app.Application;
-import android.os.Handler;
-import android.os.Looper;
 
 import androidx.annotation.NonNull;
-import androidx.core.os.HandlerCompat;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
@@ -19,103 +16,87 @@ import com.ikalangirajeev.telugubiblemessages.ui.roombible.MalayalamBibleDao;
 import com.ikalangirajeev.telugubiblemessages.ui.roombible.TamilBibleDao;
 import com.ikalangirajeev.telugubiblemessages.ui.roombible.TeluguBibleDao;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class ChaptersViewModel extends AndroidViewModel {
 
     private static final String TAG = "ChaptersViewModel";
 
-    private MutableLiveData<List<Data>> mDataList;
     private Integer versesCount;
-    private List<Data> dataList;
-    private Application application;
 
-    private ExecutorService executorService = Executors.newFixedThreadPool(10);
-    private Handler handler = HandlerCompat.createAsync(Looper.getMainLooper());
+    private BibleDatabase bibleDatabase;
+    private MutableLiveData<List<Data>> mLiveData;
 
     public ChaptersViewModel(@NonNull Application application) {
         super(application);
-        this.application = application;
-        mDataList = new MutableLiveData<>();
-        dataList = new ArrayList<>();
+        this.bibleDatabase = BibleDatabase.getBibleDatabase(application);
+        this.mLiveData = new MutableLiveData<>();
     }
 
-
     public LiveData<List<Data>> getText(String bibleSelected, int bookNumber, int chaptersCount) {
-        dataList.clear();
-
-        executorService.execute(new Runnable() {
-            @Override
-            public void run() {
-
-                switch (bibleSelected) {
-                    case "bible_english":
-                        for (int i = 1; i <= chaptersCount; i++) {
-                            BibleDatabase bibleDatabase = BibleDatabase.getBibleDatabase(application);
-                            EnglishBibleDao englishBibleDao = bibleDatabase.englishBibleDao();
-                            versesCount = englishBibleDao.getVersesCount(bookNumber, i);
-                            Data data = new Data(String.valueOf(i), versesCount + " Verses");
-                            dataList.add(data);
-                        }
-                        break;
-                    case "bible_tamil":
-                        for (int i = 1; i <= chaptersCount; i++) {
-                            BibleDatabase bibleDatabase = BibleDatabase.getBibleDatabase(application);
-                            TamilBibleDao tamilBibleDao = bibleDatabase.tamilBibleDao();
-                            versesCount = tamilBibleDao.getVersesCount(bookNumber, i);
-                            Data data = new Data(String.valueOf(i), versesCount + " வசனங்கள்");
-                            dataList.add(data);
-                        }
-                        break;
-                    case "bible_kannada":
-                        for (int i = 1; i <= chaptersCount; i++) {
-                            BibleDatabase bibleDatabase = BibleDatabase.getBibleDatabase(application);
-                            KannadaBibleDao kannadaBibleDao = bibleDatabase.kannadaBibleDao();
-                            versesCount = kannadaBibleDao.getVersesCount(bookNumber, i);
-                            Data data = new Data(String.valueOf(i), versesCount + " ಪದ್ಯಗಳು");
-                            dataList.add(data);
-                        }
-                        break;
-                    case "bible_hindi":
-                        for (int i = 1; i <= chaptersCount; i++) {
-                            BibleDatabase bibleDatabase = BibleDatabase.getBibleDatabase(application);
-                            HindiBibleDao hindiBibleDao = bibleDatabase.hindiBibleDao();
-                            versesCount = hindiBibleDao.getVersesCount(bookNumber, i);
-                            Data data = new Data(String.valueOf(i), "   " + versesCount + " छंद   ");
-                            dataList.add(data);
-                        }
-                        break;
-                    case "bible_malayalam":
-
-                        for (int i = 1; i <= chaptersCount; i++) {
-                            BibleDatabase bibleDatabase = BibleDatabase.getBibleDatabase(application);
-                            MalayalamBibleDao malayalamBibleDao = bibleDatabase.malayalamBibleDao();
-                            versesCount = malayalamBibleDao.getVersesCount(bookNumber, i);
-                            Data data = new Data(String.valueOf(i), versesCount + " വാക്യങ്ങൾ");
-                            dataList.add(data);
-                        }
-                        break;
-                    default:
-                        for (int i = 1; i <= chaptersCount; i++) {
-                            BibleDatabase bibleDatabase = BibleDatabase.getBibleDatabase(application);
-                            TeluguBibleDao teluguBibleDao = bibleDatabase.teluguBibleDao();
-                            versesCount = teluguBibleDao.getVersesCount(bookNumber, i);
-                            Data data = new Data(String.valueOf(i), versesCount + " వచనాలు");
-                            dataList.add(data);
-                        }
-                        break;
-                }
-                handler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        mDataList.setValue(dataList);
-                    }
-                });
+        CompletableFuture<List<Data>> completableFuture = CompletableFuture.supplyAsync(() -> {
+            switch (bibleSelected) {
+                case "bible_english":
+                    return IntStream.rangeClosed(1, chaptersCount)
+                            .mapToObj(index -> {
+                                EnglishBibleDao englishBibleDao = bibleDatabase.englishBibleDao();
+                                versesCount = englishBibleDao.getVersesCount(bookNumber, index);
+                                return new Data(String.valueOf(index), versesCount + " Verses");
+                            })
+                            .collect(Collectors.toList());
+                case "bible_tamil":
+                    return IntStream.rangeClosed(1, chaptersCount)
+                            .mapToObj(index -> {
+                                TamilBibleDao tamilBibleDao = bibleDatabase.tamilBibleDao();
+                                versesCount = tamilBibleDao.getVersesCount(bookNumber, index);
+                                return new Data(String.valueOf(index), versesCount + " வசனங்கள்");
+                            })
+                            .collect(Collectors.toList());
+                case "bible_kannada":
+                    return IntStream.rangeClosed(1, chaptersCount)
+                            .mapToObj(index -> {
+                                KannadaBibleDao kannadaBibleDao = bibleDatabase.kannadaBibleDao();
+                                versesCount = kannadaBibleDao.getVersesCount(bookNumber, index);
+                                return new Data(String.valueOf(index), versesCount + " ಪದ್ಯಗಳು");
+                            })
+                            .collect(Collectors.toList());
+                case "bible_hindi":
+                    return IntStream.rangeClosed(1, chaptersCount)
+                            .mapToObj(index -> {
+                                HindiBibleDao hindiBibleDao = bibleDatabase.hindiBibleDao();
+                                versesCount = hindiBibleDao.getVersesCount(bookNumber, index);
+                                return new Data(String.valueOf(index), "   " + versesCount + " छंद   ");
+                            })
+                            .collect(Collectors.toList());
+                case "bible_malayalam":
+                    return IntStream.rangeClosed(1, chaptersCount)
+                            .mapToObj(index -> {
+                                MalayalamBibleDao malayalamBibleDao = bibleDatabase.malayalamBibleDao();
+                                versesCount = malayalamBibleDao.getVersesCount(bookNumber, index);
+                                return new Data(String.valueOf(index), versesCount + " വാക്യങ്ങൾ");
+                            })
+                            .collect(Collectors.toList());
+                default:
+                    return IntStream.rangeClosed(1, chaptersCount)
+                            .mapToObj(index -> {
+                                TeluguBibleDao teluguBibleDao = bibleDatabase.teluguBibleDao();
+                                versesCount = teluguBibleDao.getVersesCount(bookNumber, index);
+                                return new Data(String.valueOf(index), versesCount + " వచనాలు");
+                            })
+                            .collect(Collectors.toList());
             }
         });
-        return mDataList;
+        try {
+            mLiveData.setValue(completableFuture.get());
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        return mLiveData;
     }
 }

@@ -208,26 +208,20 @@ public class VersesFragment extends Fragment {
         }).attachToRecyclerView(recyclerView);
 
 
-        try {
-            versesViewModel.getData(bibleSelected, bookName, bookNumber, chapterNumber).observe(getViewLifecycleOwner(), new Observer<List<Data>>() {
-                @Override
-                public void onChanged(List<Data> dataList) {
-                    myRecyclerViewAdapter.setDataList(dataList);
-                    recyclerView.scrollToPosition(highlightVerseNumber - 1);
-                    myRecyclerViewAdapter.setHighLightPosition(highlightVerseNumber - 1);
-                    myRecyclerViewAdapter.setOnItemClickListener(new VersesRecyclerViewAdapter.OnItemClickListener() {
-                        @Override
-                        public void OnItemClick(Data blogIndex, int position) {
+        versesViewModel.getData(bibleSelected, bookName, bookNumber, chapterNumber).observe(getViewLifecycleOwner(), new Observer<List<Data>>() {
+            @Override
+            public void onChanged(List<Data> dataList) {
+                myRecyclerViewAdapter.setDataList(dataList);
+                recyclerView.scrollToPosition(highlightVerseNumber - 1);
+                myRecyclerViewAdapter.setHighLightPosition(highlightVerseNumber - 1);
+                myRecyclerViewAdapter.setOnItemClickListener(new VersesRecyclerViewAdapter.OnItemClickListener() {
+                    @Override
+                    public void OnItemClick(Data blogIndex, int position) {
 
-                        }
-                    });
-                }
-            });
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+                    }
+                });
+            }
+        });
         return root;
     }
 

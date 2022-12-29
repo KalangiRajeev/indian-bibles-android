@@ -93,8 +93,8 @@ public class MainActivity extends AppCompatActivity {
         });
 //        MobileAds.initialize(getApplicationContext(), "ca-app-pub-9221045649279850~5748740579");
 
-        AdView adView = findViewById(R.id.adView);
-        AdRequest adRequest = new AdRequest.Builder().build();
+//        AdView adView = findViewById(R.id.adView);
+//        AdRequest adRequest = new AdRequest.Builder().build();
 //        adView.loadAd(adRequest);
 
         toolbar = findViewById(R.id.toolbar);
@@ -125,256 +125,243 @@ public class MainActivity extends AppCompatActivity {
                     .into(imageViewNavHeaderUserImage);
         }
 
-        imageViewNavHeaderUserImage.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent i = new Intent(Intent.ACTION_PICK,
-                        android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                startActivityForResult(i, PICK_IMAGE);
-            }
+        imageViewNavHeaderUserImage.setOnClickListener(v -> {
+            Intent i = new Intent(Intent.ACTION_PICK,
+                    MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+            startActivityForResult(i, PICK_IMAGE);
         });
 
         fab = findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (FirebaseAuth.getInstance().getCurrentUser() != null) {
-                    navController.navigate(R.id.createBlogFragment, null, new NavOptions.Builder()
+        fab.setOnClickListener(view -> {
+            if (FirebaseAuth.getInstance().getCurrentUser() != null) {
+                navController.navigate(R.id.createBlogFragment, null, new NavOptions.Builder()
+                        .setEnterAnim(R.anim.slide_in_right)
+                        .setExitAnim(R.anim.slide_out_left)
+                        .setPopEnterAnim(R.anim.slide_in_left)
+                        .setPopExitAnim(R.anim.slide_out_right)
+                        .build());
+            } else {
+                Toast.makeText(MainActivity.this, "Only Logged In User can See this page", Toast.LENGTH_LONG).show();
+
+            }
+        });
+
+
+        navigationView.setNavigationItemSelectedListener(item -> {
+            navigationView.setCheckedItem(item.getItemId());
+            Bundle bundle = new Bundle();
+            switch (item.getItemId()) {
+                case R.id.shareApp:
+                    try {
+                        Intent shareIntent = new Intent(Intent.ACTION_SEND);
+                        shareIntent.setType("text/plain");
+                        shareIntent.putExtra(Intent.EXTRA_SUBJECT, "My Application Name");
+                        String shareMessage = "Let me recommend you this Application\n\n";
+                        shareMessage = shareMessage + "https://play.google.com/store/apps/details?id=" + BuildConfig.APPLICATION_ID + "\n\n";
+                        shareIntent.putExtra(Intent.EXTRA_TEXT, shareMessage);
+                        startActivity(Intent.createChooser(shareIntent, "Share via..."));
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                case R.id.teluguBible:
+                    bibleSelected = "bible_telugu";
+                    bundle.putString("bibleSelected", bibleSelected);
+                    navController.navigate(R.id.bibleFragment, bundle, new NavOptions.Builder()
+                            .setPopUpTo(R.id.bibleFragment, true)
                             .setEnterAnim(R.anim.slide_in_right)
                             .setExitAnim(R.anim.slide_out_left)
                             .setPopEnterAnim(R.anim.slide_in_left)
                             .setPopExitAnim(R.anim.slide_out_right)
                             .build());
-                } else {
-                    Toast.makeText(MainActivity.this, "Only Logged In User can See this page", Toast.LENGTH_LONG).show();
+                    return true;
+                case R.id.englishBible:
+                    bibleSelected = "bible_english";
+                    bundle.putString("bibleSelected", bibleSelected);
+                    navController.navigate(R.id.bibleFragment, bundle, new NavOptions.Builder()
+                            .setPopUpTo(R.id.bibleFragment, true)
+                            .setEnterAnim(R.anim.slide_in_right)
+                            .setExitAnim(R.anim.slide_out_left)
+                            .setPopEnterAnim(R.anim.slide_in_left)
+                            .setPopExitAnim(R.anim.slide_out_right)
+                            .build());
+                    return true;
+                case R.id.hindiBible:
+                    bibleSelected = "bible_hindi";
+                    bundle.putString("bibleSelected", bibleSelected);
+                    navController.navigate(R.id.bibleFragment, bundle, new NavOptions.Builder()
+                            .setPopUpTo(R.id.bibleFragment, true)
+                            .setEnterAnim(R.anim.slide_in_right)
+                            .setExitAnim(R.anim.slide_out_left)
+                            .setPopEnterAnim(R.anim.slide_in_left)
+                            .setPopExitAnim(R.anim.slide_out_right)
+                            .build());
+                    return true;
 
-                }
-            }
-        });
+                case R.id.malayalamBible:
+                    bibleSelected = "bible_malayalam";
+                    bundle.putString("bibleSelected", bibleSelected);
+                    navController.navigate(R.id.bibleFragment, bundle, new NavOptions.Builder()
+                            .setPopUpTo(R.id.bibleFragment, true)
+                            .setEnterAnim(R.anim.slide_in_right)
+                            .setExitAnim(R.anim.slide_out_left)
+                            .setPopEnterAnim(R.anim.slide_in_left)
+                            .setPopExitAnim(R.anim.slide_out_right)
+                            .build());
+                    return true;
+                case R.id.tamilBible:
+                    bibleSelected = "bible_tamil";
+                    bundle.putString("bibleSelected", bibleSelected);
+                    navController.navigate(R.id.bibleFragment, bundle, new NavOptions.Builder()
+                            .setPopUpTo(R.id.bibleFragment, true)
+                            .setEnterAnim(R.anim.slide_in_right)
+                            .setExitAnim(R.anim.slide_out_left)
+                            .setPopEnterAnim(R.anim.slide_in_left)
+                            .setPopExitAnim(R.anim.slide_out_right)
+                            .build());
 
+                    return true;
+                case R.id.kannadaBible:
+                    bibleSelected = "bible_kannada";
+                    bundle.putString("bibleSelected", bibleSelected);
+                    navController.navigate(R.id.bibleFragment, bundle, new NavOptions.Builder()
+                            .setPopUpTo(R.id.bibleFragment, true)
+                            .setEnterAnim(R.anim.slide_in_right)
+                            .setExitAnim(R.anim.slide_out_left)
+                            .setPopEnterAnim(R.anim.slide_in_left)
+                            .setPopExitAnim(R.anim.slide_out_right)
+                            .build());
 
-        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-
-                navigationView.setCheckedItem(item.getItemId());
-                Bundle bundle = new Bundle();
-                switch (item.getItemId()) {
-                    case R.id.shareApp:
-                        try {
-                            Intent shareIntent = new Intent(Intent.ACTION_SEND);
-                            shareIntent.setType("text/plain");
-                            shareIntent.putExtra(Intent.EXTRA_SUBJECT, "My Application Name");
-                            String shareMessage = "Let me recommend you this Application\n\n";
-                            shareMessage = shareMessage + "https://play.google.com/store/apps/details?id=" + BuildConfig.APPLICATION_ID + "\n\n";
-                            shareIntent.putExtra(Intent.EXTRA_TEXT, shareMessage);
-                            startActivity(Intent.createChooser(shareIntent, "Share via..."));
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    case R.id.teluguBible:
-                        bibleSelected = "bible_telugu";
-                        bundle.putString("bibleSelected", bibleSelected);
-                        navController.navigate(R.id.bibleFragment, bundle, new NavOptions.Builder()
-                                .setPopUpTo(R.id.bibleFragment, true)
-                                .setEnterAnim(R.anim.slide_in_right)
-                                .setExitAnim(R.anim.slide_out_left)
-                                .setPopEnterAnim(R.anim.slide_in_left)
-                                .setPopExitAnim(R.anim.slide_out_right)
-                                .build());
-                        return true;
-                    case R.id.englishBible:
-                        bibleSelected = "bible_english";
-                        bundle.putString("bibleSelected", bibleSelected);
-                        navController.navigate(R.id.bibleFragment, bundle, new NavOptions.Builder()
-                                .setPopUpTo(R.id.bibleFragment, true)
-                                .setEnterAnim(R.anim.slide_in_right)
-                                .setExitAnim(R.anim.slide_out_left)
-                                .setPopEnterAnim(R.anim.slide_in_left)
-                                .setPopExitAnim(R.anim.slide_out_right)
-                                .build());
-                        return true;
-                    case R.id.hindiBible:
-                        bibleSelected = "bible_hindi";
-                        bundle.putString("bibleSelected", bibleSelected);
-                        navController.navigate(R.id.bibleFragment, bundle, new NavOptions.Builder()
-                                .setPopUpTo(R.id.bibleFragment, true)
-                                .setEnterAnim(R.anim.slide_in_right)
-                                .setExitAnim(R.anim.slide_out_left)
-                                .setPopEnterAnim(R.anim.slide_in_left)
-                                .setPopExitAnim(R.anim.slide_out_right)
-                                .build());
-                        return true;
-
-                    case R.id.malayalamBible:
-                        bibleSelected = "bible_malayalam";
-                        bundle.putString("bibleSelected", bibleSelected);
-                        navController.navigate(R.id.bibleFragment, bundle, new NavOptions.Builder()
-                                .setPopUpTo(R.id.bibleFragment, true)
-                                .setEnterAnim(R.anim.slide_in_right)
-                                .setExitAnim(R.anim.slide_out_left)
-                                .setPopEnterAnim(R.anim.slide_in_left)
-                                .setPopExitAnim(R.anim.slide_out_right)
-                                .build());
-                        return true;
-                    case R.id.tamilBible:
-                        bibleSelected = "bible_tamil";
-                        bundle.putString("bibleSelected", bibleSelected);
-                        navController.navigate(R.id.bibleFragment, bundle, new NavOptions.Builder()
-                                .setPopUpTo(R.id.bibleFragment, true)
-                                .setEnterAnim(R.anim.slide_in_right)
-                                .setExitAnim(R.anim.slide_out_left)
-                                .setPopEnterAnim(R.anim.slide_in_left)
-                                .setPopExitAnim(R.anim.slide_out_right)
-                                .build());
-
-                        return true;
-                    case R.id.kannadaBible:
-                        bibleSelected = "bible_kannada";
-                        bundle.putString("bibleSelected", bibleSelected);
-                        navController.navigate(R.id.bibleFragment, bundle, new NavOptions.Builder()
-                                .setPopUpTo(R.id.bibleFragment, true)
-                                .setEnterAnim(R.anim.slide_in_right)
-                                .setExitAnim(R.anim.slide_out_left)
-                                .setPopEnterAnim(R.anim.slide_in_left)
-                                .setPopExitAnim(R.anim.slide_out_right)
-                                .build());
-
-                        return true;
-                    case R.id.dictFragment:
-                        navController.navigate(R.id.dictFragment);
-                        return true;
-                    case R.id.blogsFragment:
-                        navController.navigate(R.id.blogsFragment, null, new NavOptions.Builder()
+                    return true;
+                case R.id.dictFragment:
+                    navController.navigate(R.id.dictFragment);
+                    return true;
+                case R.id.blogsFragment:
+                    navController.navigate(R.id.blogsFragment, null, new NavOptions.Builder()
+                            .setEnterAnim(R.anim.slide_in_left)
+                            .setExitAnim(R.anim.slide_out_right)
+                            .setPopEnterAnim(R.anim.slide_in_right)
+                            .setPopExitAnim(R.anim.slide_out_left)
+                            .build());
+                    return true;
+                case R.id.profileFragment:
+                    if (FirebaseAuth.getInstance().getCurrentUser() != null) {
+                        navController.navigate(R.id.profileFragment, null, new NavOptions.Builder()
                                 .setEnterAnim(R.anim.slide_in_left)
                                 .setExitAnim(R.anim.slide_out_right)
                                 .setPopEnterAnim(R.anim.slide_in_right)
                                 .setPopExitAnim(R.anim.slide_out_left)
                                 .build());
-                        return true;
-                    case R.id.profileFragment:
-                        if (FirebaseAuth.getInstance().getCurrentUser() != null) {
-                            navController.navigate(R.id.profileFragment, null, new NavOptions.Builder()
-                                    .setEnterAnim(R.anim.slide_in_left)
-                                    .setExitAnim(R.anim.slide_out_right)
-                                    .setPopEnterAnim(R.anim.slide_in_right)
-                                    .setPopExitAnim(R.anim.slide_out_left)
-                                    .build());
-                        } else {
-                            Toast.makeText(MainActivity.this, "Only Logged In User can See this page", Toast.LENGTH_LONG).show();
-                        }
-                        return true;
-                    case R.id.userBlogsFragment:
-                        if (FirebaseAuth.getInstance().getCurrentUser() != null) {
-                            navController.navigate(R.id.userBlogsFragment, null, new NavOptions.Builder()
-                                    .setEnterAnim(R.anim.slide_in_left)
-                                    .setExitAnim(R.anim.slide_out_right)
-                                    .setPopEnterAnim(R.anim.slide_in_right)
-                                    .setPopExitAnim(R.anim.slide_out_left)
-                                    .build());
-                        } else {
-                            Toast.makeText(MainActivity.this, "Only Logged In User can See this page", Toast.LENGTH_LONG).show();
-                        }
-                        return true;
-                    default:
-                        return false;
-                }
+                    } else {
+                        Toast.makeText(MainActivity.this, "Only Logged In User can See this page", Toast.LENGTH_LONG).show();
+                    }
+                    return true;
+                case R.id.userBlogsFragment:
+                    if (FirebaseAuth.getInstance().getCurrentUser() != null) {
+                        navController.navigate(R.id.userBlogsFragment, null, new NavOptions.Builder()
+                                .setEnterAnim(R.anim.slide_in_left)
+                                .setExitAnim(R.anim.slide_out_right)
+                                .setPopEnterAnim(R.anim.slide_in_right)
+                                .setPopExitAnim(R.anim.slide_out_left)
+                                .build());
+                    } else {
+                        Toast.makeText(MainActivity.this, "Only Logged In User can See this page", Toast.LENGTH_LONG).show();
+                    }
+                    return true;
+                default:
+                    return false;
             }
         });
 
-        navController.addOnDestinationChangedListener(new NavController.OnDestinationChangedListener() {
-            @Override
-            public void onDestinationChanged(@NonNull NavController controller, @NonNull NavDestination destination, @Nullable Bundle arguments) {
-                switch (destination.getId()) {
-                    case R.id.splashScreenFragment:
-                    case R.id.loginFragment:
-                    case R.id.registrationFragment:
-                    case R.id.resetPasswordFragment:
-                    case R.id.profileFragment:
-                    case R.id.verifyEmailFragment:
-                        fab.setVisibility(View.GONE);
-                        toolbar.setVisibility(View.GONE);
-                        navigationView.setVisibility(View.GONE);
-                        break;
+        navController.addOnDestinationChangedListener((controller, destination, arguments) -> {
+            switch (destination.getId()) {
+                case R.id.splashScreenFragment:
+                case R.id.loginFragment:
+                case R.id.registrationFragment:
+                case R.id.resetPasswordFragment:
+                case R.id.profileFragment:
+                case R.id.verifyEmailFragment:
+                    fab.setVisibility(View.GONE);
+                    toolbar.setVisibility(View.GONE);
+                    navigationView.setVisibility(View.GONE);
+                    break;
 
-                    case R.id.dictFragment:
-                        fab.setVisibility(View.GONE);
-                        navigationView.setVisibility(View.VISIBLE);
-                        toolbar.setTitle("నిఘంటుశోధన");
-                        toolbar.setSubtitle("English-Telugu");
-                        break;
+                case R.id.dictFragment:
+                    fab.setVisibility(View.GONE);
+                    navigationView.setVisibility(View.VISIBLE);
+                    toolbar.setTitle("నిఘంటుశోధన");
+                    toolbar.setSubtitle("English-Telugu");
+                    break;
 
-                    case R.id.bibleFragment:
-                        fab.setVisibility(View.GONE);
-                        toolbar.setVisibility(View.VISIBLE);
-                        navigationView.setVisibility(View.VISIBLE);
-                        toolbar.setSubtitle("66 Books");
-                        if (firebaseUser != null && firebaseUser.getDisplayName() != null) {
-                            textViewNavHeaderUserLoggedIn.setText(FirebaseAuth.getInstance().getCurrentUser().getDisplayName());
-                            textViewNavHeaderUserEmail.setText(FirebaseAuth.getInstance().getCurrentUser().getEmail());
-                        }
-                        break;
+                case R.id.bibleFragment:
+                    fab.setVisibility(View.GONE);
+                    toolbar.setVisibility(View.VISIBLE);
+                    navigationView.setVisibility(View.VISIBLE);
+                    toolbar.setSubtitle("66 Books");
+                    if (firebaseUser != null && firebaseUser.getDisplayName() != null) {
+                        textViewNavHeaderUserLoggedIn.setText(FirebaseAuth.getInstance().getCurrentUser().getDisplayName());
+                        textViewNavHeaderUserEmail.setText(FirebaseAuth.getInstance().getCurrentUser().getEmail());
+                    }
+                    break;
 
-                    case R.id.chaptersFragment:
-                        fab.setVisibility(View.GONE);
-                        toolbar.setVisibility(View.VISIBLE);
-                        navigationView.setVisibility(View.VISIBLE);
-                        if (arguments != null) {
-                            toolbar.setSubtitle(arguments.getString("ChaptersCount"));
-                        }
-                        break;
+                case R.id.chaptersFragment:
+                    fab.setVisibility(View.GONE);
+                    toolbar.setVisibility(View.VISIBLE);
+                    navigationView.setVisibility(View.VISIBLE);
+                    if (arguments != null) {
+                        toolbar.setSubtitle(arguments.getString("ChaptersCount"));
+                    }
+                    break;
 
-                    case R.id.versesFragment:
-                        fab.setVisibility(View.GONE);
-                        toolbar.setVisibility(View.VISIBLE);
-                        navigationView.setVisibility(View.VISIBLE);
-                        int chapterNumber = 0;
-                        if (arguments != null) {
-                            chapterNumber = arguments.getInt("ChapterNumber");
-                        }
-                        toolbar.setSubtitle( "Chapter " + chapterNumber);
-                        break;
+                case R.id.versesFragment:
+                    fab.setVisibility(View.GONE);
+                    toolbar.setVisibility(View.VISIBLE);
+                    navigationView.setVisibility(View.VISIBLE);
+                    int chapterNumber = 0;
+                    if (arguments != null) {
+                        chapterNumber = arguments.getInt("ChapterNumber");
+                    }
+                    toolbar.setSubtitle( "Chapter " + chapterNumber);
+                    break;
 
-                    case R.id.searchFragment:
-                        fab.setVisibility(View.GONE);
-                        toolbar.setVisibility(View.VISIBLE);
-                        navigationView.setVisibility(View.VISIBLE);
-                        toolbar.setTitle("Search in Bible ");
-                        break;
+                case R.id.searchFragment:
+                    fab.setVisibility(View.GONE);
+                    toolbar.setVisibility(View.VISIBLE);
+                    navigationView.setVisibility(View.VISIBLE);
+                    toolbar.setTitle("Search in Bible ");
+                    break;
 
-                    case R.id.blogsFragment:
-                        fab.setVisibility(View.VISIBLE);
-                        toolbar.setVisibility(View.VISIBLE);
-                        toolbar.setTitle("Posts 2020");
-                        toolbar.setSubtitle("Press '+' to create...");
-                        break;
+                case R.id.blogsFragment:
+                    fab.setVisibility(View.VISIBLE);
+                    toolbar.setVisibility(View.VISIBLE);
+                    toolbar.setTitle("Posts 2020");
+                    toolbar.setSubtitle("Press '+' to create...");
+                    break;
 
-                    case R.id.userBlogsFragment:
-                        fab.setVisibility(View.VISIBLE);
-                        toolbar.setVisibility(View.VISIBLE);
-                        navigationView.setVisibility(View.VISIBLE);
-                        toolbar.setTitle(FirebaseAuth.getInstance().getCurrentUser().getDisplayName());
-                        toolbar.setSubtitle("Posts...");
-                        break;
+                case R.id.userBlogsFragment:
+                    fab.setVisibility(View.VISIBLE);
+                    toolbar.setVisibility(View.VISIBLE);
+                    navigationView.setVisibility(View.VISIBLE);
+                    toolbar.setTitle(FirebaseAuth.getInstance().getCurrentUser().getDisplayName());
+                    toolbar.setSubtitle("Posts...");
+                    break;
 
-                    case R.id.createBlogFragment:
-                        fab.setVisibility(View.GONE);
-                        toolbar.setVisibility(View.VISIBLE);
-                        navigationView.setVisibility(View.VISIBLE);
-                        toolbar.setTitle("Create a Post");
-                        toolbar.setSubtitle("As you wish...");
-                        break;
+                case R.id.createBlogFragment:
+                    fab.setVisibility(View.GONE);
+                    toolbar.setVisibility(View.VISIBLE);
+                    navigationView.setVisibility(View.VISIBLE);
+                    toolbar.setTitle("Create a Post");
+                    toolbar.setSubtitle("As you wish...");
+                    break;
 
-                    case R.id.detailBlogFragment:
-                        fab.setVisibility(View.GONE);
-                        toolbar.setVisibility(View.VISIBLE);
-                        navigationView.setVisibility(View.VISIBLE);
-                        toolbar.setTitle("Comments Section");
-                        toolbar.setSubtitle("");
-                        break;
-                }
-                drawerLayout.closeDrawer(GravityCompat.START);
+                case R.id.detailBlogFragment:
+                    fab.setVisibility(View.GONE);
+                    toolbar.setVisibility(View.VISIBLE);
+                    navigationView.setVisibility(View.VISIBLE);
+                    toolbar.setTitle("Comments Section");
+                    toolbar.setSubtitle("");
+                    break;
             }
+            drawerLayout.closeDrawer(GravityCompat.START);
         });
 
     }

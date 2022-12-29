@@ -5,21 +5,16 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.preference.PreferenceManager;
-import android.transition.Explode;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
-import android.widget.Toolbar;
 
 import androidx.annotation.Nullable;
 import androidx.annotation.NonNull;
 import androidx.core.os.HandlerCompat;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.lifecycle.ViewModelProviders;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.GridLayoutManager;
@@ -29,11 +24,6 @@ import com.ikalangirajeev.telugubiblemessages.R;
 import com.ikalangirajeev.telugubiblemessages.ui.SettingsFragment;
 import com.ikalangirajeev.telugubiblemessages.ui.bible.app.Data;
 import com.ikalangirajeev.telugubiblemessages.ui.bible.app.MyRecyclerViewAdapter;
-
-
-import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 public class BooksFragment extends Fragment {
 
@@ -49,7 +39,6 @@ public class BooksFragment extends Fragment {
     private boolean isTablet;
     private View view;
 
-    ExecutorService executorService = Executors.newFixedThreadPool(4);
     Handler handler = HandlerCompat.createAsync(Looper.getMainLooper());
 
     @Override
@@ -89,27 +78,17 @@ public class BooksFragment extends Fragment {
         recyclerView.setAdapter(myRecyclerViewAdapter);
 
 
-        booksViewModel.getText(bibleSelected).observe(getViewLifecycleOwner(), new Observer<List<Data>>() {
-            @Override
-            public void onChanged(final List<Data> data) {
-
-                myRecyclerViewAdapter.setDataList(data);
-
-                myRecyclerViewAdapter.setOnRyVwItemClickListener(new MyRecyclerViewAdapter.OnRyVwItemClickListener() {
-                    @Override
-                    public void OnRyVwItemClick(Data data, int position) {
-                        Bundle bundle = new Bundle();
-                        bundle.putString("bibleSelected", bibleSelected);
-                        bundle.putString("BookName", data.getHeader());
-                        bundle.putInt("BookNumber", position);
-                        bundle.putInt("ChaptersCount", data.getRefLink());
-                        navController.navigate(R.id.action_bibleFragment_to_chaptersFragment, bundle);
-                    }
-                });
-            }
-
+        booksViewModel.getBooksForSelectedBible(bibleSelected).observe(getViewLifecycleOwner(), data -> {
+            myRecyclerViewAdapter.setDataList(data);
+            myRecyclerViewAdapter.setOnRyVwItemClickListener((data1, position) -> {
+                Bundle bundle = new Bundle();
+                bundle.putString("bibleSelected", bibleSelected);
+                bundle.putString("BookName", data1.getHeader());
+                bundle.putInt("BookNumber", position);
+                bundle.putInt("ChaptersCount", data1.getRefLink());
+                navController.navigate(R.id.action_bibleFragment_to_chaptersFragment, bundle);
+            });
         });
-
         return view;
     }
 

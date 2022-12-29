@@ -107,39 +107,47 @@ public class SplashScreenFragment extends Fragment {
             @Override
             public void run() {
                 NavController navController = Navigation.findNavController(getActivity(), R.id.nav_host_fragment);
-                if (firebaseUser == null) {
-                    navController.navigate(R.id.loginFragment, null, new NavOptions.Builder()
-                            .setPopUpTo(R.id.splashScreenFragment, true)
-                            .setEnterAnim(R.anim.slide_in_right)
-                            .setExitAnim(R.anim.slide_out_left)
-                            .setPopEnterAnim(R.anim.slide_in_left)
-                            .setPopExitAnim(R.anim.slide_out_right)
-                            .build());
-                } else if (!firebaseUser.isEmailVerified()) {
+                navController.navigate(R.id.bibleFragment, null, new NavOptions.Builder()
+                        .setPopUpTo(R.id.splashScreenFragment, true)
+                        .setEnterAnim(R.anim.slide_in_right)
+                        .setExitAnim(R.anim.slide_out_left)
+                        .setPopEnterAnim(R.anim.slide_in_left)
+                        .setPopExitAnim(R.anim.slide_out_right)
+                        .build());
 
-                    firebaseUser.getDisplayName();
-                    firebaseUser.getEmail();
-                    firebaseUser.isEmailVerified();
-                    firebaseUser.getPhoneNumber();
-
-                    Bundle bundle = new Bundle();
-                    bundle.putString("email", firebaseUser.getEmail());
-                    Toast.makeText(getContext(), firebaseUser.getEmail(), Toast.LENGTH_LONG).show();
-                    navController.navigate(R.id.verifyEmailFragment, bundle, new NavOptions.Builder()
-                            .setPopUpTo(R.id.splashScreenFragment, true)
-                            .setEnterAnim(R.anim.slide_in_right)
-                            .setExitAnim(R.anim.slide_out_left)
-                            .setPopEnterAnim(R.anim.slide_in_left)
-                            .setPopExitAnim(R.anim.slide_out_right).build());
-                } else {
-                    navController.navigate(R.id.bibleFragment, null, new NavOptions.Builder()
-                            .setPopUpTo(R.id.splashScreenFragment, true)
-                            .setEnterAnim(R.anim.slide_in_right)
-                            .setExitAnim(R.anim.slide_out_left)
-                            .setPopEnterAnim(R.anim.slide_in_left)
-                            .setPopExitAnim(R.anim.slide_out_right)
-                            .build());
-                }
+//                if (firebaseUser == null) {
+//                    navController.navigate(R.id.loginFragment, null, new NavOptions.Builder()
+//                            .setPopUpTo(R.id.splashScreenFragment, true)
+//                            .setEnterAnim(R.anim.slide_in_right)
+//                            .setExitAnim(R.anim.slide_out_left)
+//                            .setPopEnterAnim(R.anim.slide_in_left)
+//                            .setPopExitAnim(R.anim.slide_out_right)
+//                            .build());
+//                } else if (!firebaseUser.isEmailVerified()) {
+//
+//                    firebaseUser.getDisplayName();
+//                    firebaseUser.getEmail();
+//                    firebaseUser.isEmailVerified();
+//                    firebaseUser.getPhoneNumber();
+//
+//                    Bundle bundle = new Bundle();
+//                    bundle.putString("email", firebaseUser.getEmail());
+//                    Toast.makeText(getContext(), firebaseUser.getEmail(), Toast.LENGTH_LONG).show();
+//                    navController.navigate(R.id.verifyEmailFragment, bundle, new NavOptions.Builder()
+//                            .setPopUpTo(R.id.splashScreenFragment, true)
+//                            .setEnterAnim(R.anim.slide_in_right)
+//                            .setExitAnim(R.anim.slide_out_left)
+//                            .setPopEnterAnim(R.anim.slide_in_left)
+//                            .setPopExitAnim(R.anim.slide_out_right).build());
+//                } else {
+//                    navController.navigate(R.id.bibleFragment, null, new NavOptions.Builder()
+//                            .setPopUpTo(R.id.splashScreenFragment, true)
+//                            .setEnterAnim(R.anim.slide_in_right)
+//                            .setExitAnim(R.anim.slide_out_left)
+//                            .setPopEnterAnim(R.anim.slide_in_left)
+//                            .setPopExitAnim(R.anim.slide_out_right)
+//                            .build());
+//                }
             }
         }, SPLASH_SREEN_TIME);
 

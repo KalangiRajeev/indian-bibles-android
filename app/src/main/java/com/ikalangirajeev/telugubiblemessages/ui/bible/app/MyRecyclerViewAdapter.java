@@ -94,10 +94,10 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAd
         }
 
         public void setData(Data data) {
-            Animation animation = AnimationUtils.loadAnimation(context, R.anim.slide_in_up);
-            animation.setDuration(1000);
-            animation.setInterpolator(new AnticipateOvershootInterpolator());
-            itemView.startAnimation(animation);
+//            Animation animation = AnimationUtils.loadAnimation(context, R.anim.slide_in_up);
+//            animation.setDuration(1000);
+//            animation.setInterpolator(new AnticipateOvershootInterpolator());
+//            itemView.startAnimation(animation);
 
             this.headerTextView.setText(data.getHeader());
             this.bodyTextView.setText(data.getBody());
