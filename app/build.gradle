@@ -35,7 +35,7 @@ dependencies {
     implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
 
     //GSON
-    implementation 'com.google.code.gson:gson:2.10'
+    implementation 'com.google.code.gson:gson:2.10.1'
     //Firebase Database
     implementation 'com.google.firebase:firebase-database:20.1.0'
     //Firebase Auth
@@ -58,7 +58,7 @@ dependencies {
     annotationProcessor 'com.github.bumptech.glide:compiler:4.14.2'
 
     //Banner Ad
-    implementation 'com.google.android.gms:play-services-ads:21.3.0'
+    implementation 'com.google.android.gms:play-services-ads:21.4.0'
 
     //Firebase UI
     implementation 'com.firebaseui:firebase-ui-database:8.0.2'
@@ -91,14 +91,14 @@ dependencies {
     androidTestImplementation 'androidx.test:core:1.5.0'
 
     //Espresso testing
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.0'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
 
     // AndroidJUnitRunner and JUnit Rules
-    androidTestImplementation 'androidx.test:runner:1.5.1'
+    androidTestImplementation 'androidx.test:runner:1.5.2'
     androidTestImplementation 'androidx.test:rules:1.5.0'
 
     // Assertions
-    androidTestImplementation 'androidx.test.ext:junit:1.1.4'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     androidTestImplementation 'androidx.test.ext:truth:1.5.0'
     androidTestImplementation 'com.google.truth:truth:1.1.3'
 

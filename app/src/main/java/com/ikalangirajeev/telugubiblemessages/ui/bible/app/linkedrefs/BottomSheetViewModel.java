@@ -27,9 +27,14 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 import java.io.InputStream;
+import java.security.Security;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 public class BottomSheetViewModel extends AndroidViewModel {
 
@@ -44,11 +49,12 @@ public class BottomSheetViewModel extends AndroidViewModel {
         linkedVersesList = new MutableLiveData<>();
     }
 
-    public LiveData<List<LinkVerse>> getData(String bibleSelected, Integer verseId) {
+    public LiveData<List<LinkVerse>> getData(String bibleSelected, Integer verseId, String bookName, Integer bookNumber, Integer chapterNumber, Integer verseNumber) {
 
 
         try {
-            verseInfoList = new VerseInfoAsyncTask(getApplication()).execute(verseId).get();
+//            verseInfoList = new VerseInfoAsyncTask(getApplication()).execute(verseId).get();
+            verseInfoList = getLinkedReferencesList(bookNumber, chapterNumber, verseNumber);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -99,6 +105,68 @@ public class BottomSheetViewModel extends AndroidViewModel {
         }
         linkedVersesList.setValue(linkVerseList);
         return linkedVersesList;
+    }
+
+    private List<VerseInfo> getLinkedReferencesList(Integer bookNo, Integer chapterNo, Integer verseNo) throws ExecutionException, InterruptedException, TimeoutException {
+        CompletableFuture<List<VerseInfo>> cfVerseInfoList =  CompletableFuture.supplyAsync(() -> {
+            List<VerseInfo> verseInfoList = new ArrayList<>();
+            String jsonCrossReferences;
+            String[] bookEngNames = {"GEN", "EXO", "LEV", "NUM", "DEU", "JOS", "JDG", "RUT", "1SA", "2SA", "1KI", "2KI",
+                    "1CH", "2CH", "EZR", "NEH", "EST", "JOB", "PSA", "PRO", "ECC", "SOS", "ISA", "JER", "LAM", "EZE", "DAN",
+                    "HOS", "JOE", "AMO", "OBA", "JON", "MIC", "NAH", "HAB", "ZEP", "HAG", "ZEC", "MAL", "MAT", "MAR", "LUK", "JOH", "ACT",
+                    "ROM", "1CO", "2CO", "GAL", "EPH", "PHP", "COL", "1TH", "2TH", "1TI", "2TI", "TIT", "PHM", "HEB", "JAM",
+                    "1PE", "2PE", "1JO", "2JO", "3JO", "JDE", "REV"};
+            try {
+                InputStream inputStream = getApplication().getAssets().open("cross_references.json");
+                byte[] bytes = new byte[inputStream.available()];
+                inputStream.read(bytes);
+                inputStream.close();
+                jsonCrossReferences = new String(bytes, "UTF-8");
+                JSONParser jsonParser = new JSONParser();
+                JSONObject jsonObject = (JSONObject) jsonParser.parse(jsonCrossReferences);
+                Iterator keys = jsonObject.keySet().iterator();
+                while (keys.hasNext()) {
+                    String key = (String) keys.next();
+                    JSONObject jsonLinkedRefObject = (JSONObject) jsonObject.get(key);
+                    String checkReference = (String) jsonLinkedRefObject.get("v");
+                    String[] splitCheckReference = checkReference.trim().split("\\s+");
+
+                    if (bookEngNames[bookNo].equals(splitCheckReference[0])
+                            && Integer.toString(chapterNo).equals(splitCheckReference[1])
+                            && Integer.toString(verseNo).equals(splitCheckReference[2])) {
+                       JSONObject jsonLinkedRefs = (JSONObject) jsonLinkedRefObject.get("r");
+                        if (jsonLinkedRefs != null) {
+                           Iterator linkedRefKeys = jsonLinkedRefs.keySet().iterator();
+                            while (linkedRefKeys.hasNext()) {
+                                String linkVerseId = (String) linkedRefKeys.next();
+                                String linkVerseInfo = (String) jsonLinkedRefs.get(linkVerseId);
+                                String[] splitString = new String[0];
+                                if (linkVerseInfo != null) {
+                                    splitString = linkVerseInfo.trim().split("\\s+");
+                                }
+                                Integer bookNumber = null;
+                                for (int i = 0; i < bookEngNames.length; i++) {
+                                    if (splitString[0].equalsIgnoreCase(bookEngNames[i])) {
+                                        bookNumber = i;
+                                        break;
+                                    }
+                                }
+                                Integer chapterNumber = Integer.parseInt(splitString[1]) ;
+                                Integer verseNumber = Integer.parseInt(splitString[2]);
+                                VerseInfo verseInfo = new VerseInfo(Integer.parseInt(linkVerseId), bookNumber, chapterNumber, verseNumber);
+                                verseInfoList.add(verseInfo);
+                            }
+                        }
+                    }
+                }
+            } catch (ParseException pe) {
+                pe.printStackTrace();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return verseInfoList;
+        });
+        return cfVerseInfoList.get();
     }
 
     private class VerseInfoAsyncTask extends AsyncTask<Integer, Void, List<VerseInfo>> {

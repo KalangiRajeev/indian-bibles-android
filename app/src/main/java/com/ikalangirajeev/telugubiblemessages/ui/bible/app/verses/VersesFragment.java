@@ -185,12 +185,12 @@ public class VersesFragment extends Fragment {
                     bundle.putString("bookName", bookName);
                     bundle.putInt("bookNumber", bookNumber);
                     bundle.putInt("chapterNumber", chapterNumber);
-                    bundle.putInt("verseNumber", viewHolder.getAdapterPosition());
+                    bundle.putInt("verseNumber", viewHolder.getAdapterPosition() + 1);
                     bundle.putString("verseBody", myRecyclerViewAdapter.getDataAt(viewHolder.getAdapterPosition()).getBody());
                     bundle.putInt("verseId", myRecyclerViewAdapter.getDataAt(viewHolder.getAdapterPosition()).getRefLink());
                     bottomSheetFragment.setArguments(bundle);
                     bottomSheetFragment.show(getActivity().getSupportFragmentManager(), "bottomSheetFragment");
-                    vibrator.vibrate(500);
+                    vibrator.vibrate(50);
 
                 } else if (ItemTouchHelper.RIGHT == direction) {
                     Intent sendIntent = new Intent();
@@ -201,7 +201,7 @@ public class VersesFragment extends Fragment {
                     sendIntent.setType("text/plain");
                     Intent shareIntent = Intent.createChooser(sendIntent, null);
                     startActivity(shareIntent);
-                    vibrator.vibrate(500);
+                    vibrator.vibrate(50);
                     Toast.makeText(getActivity(), "Share...", Toast.LENGTH_LONG).show();
                 }
             }

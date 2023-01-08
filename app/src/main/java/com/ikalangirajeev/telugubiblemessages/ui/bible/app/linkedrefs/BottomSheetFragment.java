@@ -73,15 +73,12 @@ public class BottomSheetFragment extends BottomSheetDialogFragment {
         bottomSheetRecyclerViewAdapter = new BottomSheetRecyclerViewAdapter(getActivity(), R.layout.card_view_bottomsheet);
         recyclerView.setAdapter(bottomSheetRecyclerViewAdapter);
 
-        textViewHeader.setText(bookName + " " + (chapterNumber) + ":" + (verseNumber + 1));
+        textViewHeader.setText(bookName + " " + (chapterNumber) + ":" + (verseNumber));
         textViewBody.setText(verseBody);
 
-        bottomSheetViewModel.getData(bibleSelected, verseId).observe(getViewLifecycleOwner(), new Observer<List<LinkVerse>>() {
-            @Override
-            public void onChanged(List<LinkVerse> linkVerses) {
-                bottomSheetRecyclerViewAdapter.setLinkVerseList(linkVerses);
-                linkedRefsCount.setText(bottomSheetRecyclerViewAdapter.getItemCount() + " Cross References " );
-            }
+        bottomSheetViewModel.getData(bibleSelected, verseId, bookName, bookNumber, chapterNumber, verseNumber).observe(getViewLifecycleOwner(), linkVerses -> {
+            bottomSheetRecyclerViewAdapter.setLinkVerseList(linkVerses);
+            linkedRefsCount.setText(bottomSheetRecyclerViewAdapter.getItemCount() + " Cross References " );
         });
         return view;
     }
